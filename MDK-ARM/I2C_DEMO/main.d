@@ -1,4 +1,4 @@
-i2c_demo\main.o: ../Core/Src/main.c
+i2c_demo\main.o: ..\Core\Src\main.c
 i2c_demo\main.o: ../Core/Inc/main.h
 i2c_demo\main.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h
 i2c_demo\main.o: ../Core/Inc/stm32f4xx_hal_conf.h

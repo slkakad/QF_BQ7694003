@@ -61,15 +61,15 @@
 TIM_HandleTypeDef htim3;
 typedef enum
 {
-	Quanta_OK = 0x00,
-	Quanta_I2CFail = 0x01,
-	Quanta_CRCFail = 0x02,
-	Quanta_WRFail = 0x03,
-	Quanta_MemFail =0x04
-}QuantaStatusTypedef;
+	Oper_OK = 0x00,
+	Oper_I2CFail = 0x01,
+	Oper_CRCFail = 0x02,
+	Oper_WRFail = 0x03,
+	Oper_MemFail =0x04
+}OperStatusTypedef;
 /* USER CODE BEGIN PV */
 RegisterGroup Registers;
-QuantaStatusTypedef OperationStatus;
+OperStatusTypedef OperationStatus;
 
 const unsigned int OVPThreshold = 4300;
 const unsigned int UVPThreshold = 2500;
@@ -158,7 +158,7 @@ unsigned char CRC8(unsigned char *ptr, unsigned char len,unsigned char key)
 	}
 	return(crc);
 }
-QuantaStatusTypedef I2CWriteRegistorWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Address,uint8_t Register,uint8_t Data)
+OperStatusTypedef I2CWriteRegistorWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Address,uint8_t Register,uint8_t Data)
 {
 	unsigned char DataBuffer[4];
 	HAL_StatusTypeDef status;
@@ -169,11 +169,11 @@ QuantaStatusTypedef I2CWriteRegistorWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_
 	status = HAL_I2C_Master_Transmit(hi2c,(I2C_Address << 1),(DataBuffer+1),3,TimeOutI2C);
 	if(status != HAL_OK)
 		{
-			return Quanta_I2CFail;
+			return Oper_I2CFail;
 		}
-	return Quanta_OK;
+	return Oper_OK;
 }
-QuantaStatusTypedef I2CWriteBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Address,uint8_t Register,uint8_t *Buffer,uint8_t Length)
+OperStatusTypedef I2CWriteBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Address,uint8_t Register,uint8_t *Buffer,uint8_t Length)
 {
 	unsigned char *BufferCRC, *Pointer;
 	int i;
@@ -182,7 +182,7 @@ QuantaStatusTypedef I2CWriteBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Add
 	BufferCRC = (unsigned char*)malloc(2*Length + 2);
 	if (NULL == BufferCRC)
 	{
-		return Quanta_MemFail;
+		return Oper_MemFail;
 	}
 
 	Pointer = BufferCRC;
@@ -203,18 +203,18 @@ QuantaStatusTypedef I2CWriteBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Add
 			Pointer++;
 	}
 	status = HAL_I2C_Master_Transmit(&hi2c1,I2C_Address<<1,(BufferCRC+1),(2*Length + 1),TimeOutI2C);
-	if (status != Quanta_OK)
+	if (status != Oper_OK)
 	{
-		return Quanta_I2CFail;
+		return Oper_I2CFail;
 	}
 	free(BufferCRC);
 	BufferCRC = NULL;
 
-	return Quanta_OK;
+	return Oper_OK;
 }
 
 
-QuantaStatusTypedef I2CReadBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Address,uint8_t Register,uint8_t *Buffer,uint8_t Length)
+OperStatusTypedef I2CReadBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Address,uint8_t Register,uint8_t *Buffer,uint8_t Length)
 {
 	uint8_t *ReadData=NULL, *StartData = NULL;;
 	unsigned char CRCInput[2];
@@ -224,17 +224,17 @@ QuantaStatusTypedef I2CReadBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Addr
 	int i;
 	if (NULL == StartData)
 	{
-    	return Quanta_MemFail;
+    	return Oper_MemFail;
 	}
 	ReadData = StartData;
 
 	status = HAL_I2C_Master_Transmit(hi2c,(I2C_Address << 1),&Register,1,TimeOutI2C);    // CRC -> N
 	if( status  != HAL_OK){
-		return Quanta_I2CFail;
+		return Oper_I2CFail;
 	}
 	status = HAL_I2C_Master_Receive(&hi2c1,(I2C_Address<<1)+0x01,ReadData,(2*Length),TimeOutI2C);  // CRC -> Y
 	if (status !=  HAL_OK){
-		return Quanta_I2CFail;
+		return Oper_I2CFail;
 	}
 	CRCInput[0] = (BQ_ADD<< 1) + 1;
 	CRCInput[1] = *ReadData;
@@ -245,7 +245,7 @@ QuantaStatusTypedef I2CReadBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Addr
 	{
 		free(StartData);
 		StartData = NULL;
-		return Quanta_CRCFail;
+		return Oper_CRCFail;
 	}
 	else
 	{
@@ -263,7 +263,7 @@ QuantaStatusTypedef I2CReadBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Addr
 			free(StartData);
 			StartData = NULL;
 
-			return Quanta_CRCFail;
+			return Oper_CRCFail;
 		}
 		else
 			*Buffer = *(ReadData - 1);
@@ -272,10 +272,10 @@ QuantaStatusTypedef I2CReadBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Addr
 	free(StartData);
 	StartData = NULL;
 
-	return Quanta_OK;
+	return Oper_OK;
 	
 }
-QuantaStatusTypedef I2CReadRegisterByteWithCRC(I2C_HandleTypeDef *hi2c,unsigned char I2CSlaveAddress, unsigned char Register, unsigned char *Data)
+OperStatusTypedef I2CReadRegisterByteWithCRC(I2C_HandleTypeDef *hi2c,unsigned char I2CSlaveAddress, unsigned char Register, unsigned char *Data)
 {
 	unsigned char TargetRegister = Register;
 	unsigned char ReadData[2];
@@ -289,7 +289,7 @@ QuantaStatusTypedef I2CReadRegisterByteWithCRC(I2C_HandleTypeDef *hi2c,unsigned 
 
 	if (ReadStatus != 0 || WriteStatus != 0)
 	{
-		return Quanta_I2CFail;
+		return Oper_I2CFail;
 	}
 
 	CRCInput[0] = (I2CSlaveAddress << 1) + 1;
@@ -298,43 +298,43 @@ QuantaStatusTypedef I2CReadRegisterByteWithCRC(I2C_HandleTypeDef *hi2c,unsigned 
 	CRCValue = CRC8(CRCInput, 2, CRC_KEY);
 
 	if (CRCValue != ReadData[1])
-		return Quanta_CRCFail;
+		return Oper_CRCFail;
 
 	*Data = ReadData[0];
-	return Quanta_OK;
+	return Oper_OK;
 }
 
-QuantaStatusTypedef GetADCGainOffset()    /* I2C byter read*/ 
+OperStatusTypedef GetADCGainOffset()    /* I2C byter read*/ 
 {
 	HAL_StatusTypeDef result;
 	result=HAL_I2C_Mem_Read(&hi2c1,((BQ_ADD)<<1)|0x01, ADCGAIN1, 1,&(Registers.ADCGain1.ADCGain1Byte),sizeof(Registers.ADCGain1.ADCGain1Byte),TimeOutI2C);
 	if ( result  !=  HAL_OK)
 	{
-		return  Quanta_I2CFail;;
+		return  Oper_I2CFail;;
 	}
   result=HAL_I2C_Mem_Read(&hi2c1,((BQ_ADD)<<1)|0x01, ADCGAIN2, 1,&(Registers.ADCGain2.ADCGain2Byte),sizeof(Registers.ADCGain1.ADCGain1Byte),TimeOutI2C);
   if ( result  !=  HAL_OK)
 	{
-		return Quanta_I2CFail;
+		return Oper_I2CFail;
 	}
 	result=HAL_I2C_Mem_Read(&hi2c1,((BQ_ADD)<<1)|0x01, ADCOFFSET, 1,&(Registers. ADCOffset),sizeof(Registers. ADCOffset),TimeOutI2C);
 	if ( result  !=  HAL_OK)
 	{
-		//Status  =  Quanta_I2CFail;
-		return Quanta_I2CFail;
+		//Status  =  Oper_I2CFail;
+		return Oper_I2CFail;
 	}
-	return Quanta_OK;
+	return Oper_OK;
 }
-QuantaStatusTypedef ConfigureBqMaximo()
+OperStatusTypedef ConfigureBqMaximo()
 {
 	unsigned char bqMaximoProtectionConfig[5]; 
-	QuantaStatusTypedef result;
+	OperStatusTypedef result;
   result=I2CWriteBlockWithCRC(&hi2c1,BQ_ADD, PROTECT1,&(Registers.Protect1.Protect1Byte),5);
-	if (result != Quanta_OK){
+	if (result != Oper_OK){
 		return result;
 	}
   result=I2CReadBlockWithCRC(&hi2c1,BQ_ADD, PROTECT1,bqMaximoProtectionConfig,5);
-	if (result != Quanta_OK){
+	if (result != Oper_OK){
 		return result;
 	} 
 	if(bqMaximoProtectionConfig[0] != Registers.Protect1.Protect1Byte
@@ -343,13 +343,13 @@ QuantaStatusTypedef ConfigureBqMaximo()
 			|| bqMaximoProtectionConfig[3] != Registers.OVTrip
 			|| bqMaximoProtectionConfig[4] != Registers.UVTrip)
 	{
-		return Quanta_WRFail;
+		return Oper_WRFail;
 	}
-	return Quanta_OK;
+	return Oper_OK;
 }
-QuantaStatusTypedef InitialisebqMaximo()
+OperStatusTypedef InitialisebqMaximo()
 {
-	QuantaStatusTypedef result;
+	OperStatusTypedef result;
 	Registers.Protect1.Protect1Bit.SCD_DELAY = SCDDelay;
 	Registers.Protect1.Protect1Bit.SCD_THRESH = SCDThresh;
 	Registers.Protect2.Protect2Bit.OCD_DELAY = OCDDelay;
@@ -358,7 +358,7 @@ QuantaStatusTypedef InitialisebqMaximo()
 	Registers.Protect3.Protect3Bit.UV_DELAY = UVDelay;
 	
 	result = GetADCGainOffset();
-	if(result != Quanta_OK)
+	if(result != Oper_OK)
 	{
 		return result;
 	}
@@ -373,7 +373,7 @@ QuantaStatusTypedef InitialisebqMaximo()
 
     return result;
 }
-QuantaStatusTypedef UpdateCellVoltage()
+OperStatusTypedef UpdateCellVoltage()
 {	
 	uint8_t i=0;
 	unsigned char *pRawADCData = NULL;
@@ -381,7 +381,7 @@ QuantaStatusTypedef UpdateCellVoltage()
 	unsigned long lTemp = 0;
 	
 	OperationStatus = I2CReadBlockWithCRC(&hi2c1,BQ_ADD,VC1_HI_BYTE,&(Registers.VCell1.VCell1Byte.VC1_HI),(CellCount*2));
-	if (OperationStatus != Quanta_OK)
+	if (OperationStatus != Oper_OK)
 	{
 		return OperationStatus;
 	}
@@ -396,27 +396,27 @@ QuantaStatusTypedef UpdateCellVoltage()
     CellSum = CellSum + CellVoltage[i];
 		pRawADCData += 2;
 	}
-	return Quanta_OK;
+	return Oper_OK;
 }
-QuantaStatusTypedef UpdateBatteryVolatge()
+OperStatusTypedef UpdateBatteryVolatge()
 {
-	 QuantaStatusTypedef status;
+	 OperStatusTypedef status;
 	 status = I2CReadBlockWithCRC(&hi2c1,BQ_ADD,0x2A,&(Registers.VBat.VBatByte.BAT_HI),2);
 	 //Result=HAL_I2C_Mem_Read(&hi2c1,((BQ_ADD)<<1)|0x01,42, 1,&(Registers.VBat.VBatByte.BAT_HI),sizeof(Registers.VBat.VBatByte.BAT_HI),TimeOutI2C);
 	 //Result=HAL_I2C_Mem_Read(&hi2c1,((BQ_ADD)<<1)|0x01,43, 1,&(Registers.VBat.VBatByte.BAT_LO),sizeof(Registers.VBat.VBatByte.BAT_LO),TimeOutI2C);
    BatteryVoltage= 4*Gain*(((Registers.VBat.VBatByte.BAT_HI)<<8)+ Registers.VBat.VBatByte.BAT_LO)+(CellCount*Registers. ADCOffset);
 	return status;
 }
-QuantaStatusTypedef UpdateTemp()
+OperStatusTypedef UpdateTemp()
 {		
-	QuantaStatusTypedef status;
+	OperStatusTypedef status;
 	uint8_t i=0;
 	unsigned int iTemp = 0;
 	unsigned long lTemp = 0;
 	unsigned char *pRawADCData = NULL ;
 	uint16_t *pPointer = TempSense;
 	status  = I2CReadBlockWithCRC(&hi2c1,BQ_ADD,TEMP_Hi,&(Registers.TS1.TS1Byte.TS1_HI),(ExternalTemprature*2));
-	if (status != Quanta_OK)
+	if (status != Oper_OK)
 	{
 		return status;
 	}
@@ -431,9 +431,9 @@ QuantaStatusTypedef UpdateTemp()
 	}
 	return status;
  }
-QuantaStatusTypedef UpdateCurrent()
+OperStatusTypedef UpdateCurrent()
 {
-	QuantaStatusTypedef status;
+	OperStatusTypedef status;
 	status = I2CReadBlockWithCRC(&hi2c1,BQ_ADD,CC_HI_Add,&(Registers.CC.CCByte.CC_HI),2);
 	return status;
 }
@@ -540,7 +540,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	HAL_TIM_Base_Start_IT(&htim3);
 	OperationStatus =  InitialisebqMaximo();
-	if (OperationStatus != Quanta_OK)
+	if (OperationStatus != Oper_OK)
 	{
 		// LED indication 
 		// Fault and Log the Data

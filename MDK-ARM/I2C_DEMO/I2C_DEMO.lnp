@@ -1,6 +1,5 @@
 --cpu=Cortex-M4.fp.sp
 "i2c_demo\startup_stm32f407xx.o"
-"i2c_demo\bq79400.o"
 "i2c_demo\stm32f4xx_it.o"
 "i2c_demo\stm32f4xx_hal_msp.o"
 "i2c_demo\main050722.o"
