@@ -1,43 +1,4 @@
-/*
- * bqMaximo_Ctrl_G2553.h
- *
- * bq769x0 CRC code example header file
- *
- * Copyright (C) 2015 Texas Instruments Incorporated - http://www.ti.com/ 
- * 
- * 
- *  Redistribution and use in source and binary forms, with or without 
- *  modification, are permitted provided that the following conditions 
- *  are met:
- *
- *    Redistributions of source code must retain the above copyright 
- *    notice, this list of conditions and the following disclaimer.
- *
- *    Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the 
- *    documentation and/or other materials provided with the   
- *    distribution.
- *
- *    Neither the name of Texas Instruments Incorporated nor the names of
- *    its contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- *  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- *  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- *  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
- *  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- *  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- *  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
- *  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE 
- *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
-*/
-
-
-#define BQMAXIMO 8
+#define BQ_ADD 8
 
 #define LOWBYTE(Data) (unsigned char)(0x00ff & Data)
 
@@ -66,55 +27,9 @@
 #define ADCOFFSET 0x51
 #define ADCGAIN2 0x59
 
-#define SCD_DELAY_50us		0x0
-#define SCD_DELAY_100us		0x1
-#define SCD_DEALY_200us		0x2
-#define SCD_DELAY_400us		0x3
 
-#define SCD_THRESH_44mV_22mV	0
-#define SCD_THRESH_67mV_33mV	1
-#define SCD_THRESH_89mV_44mV	2
-#define SCD_THRESH_111mV_56mV	3
-#define SCD_THRESH_133mV_67mV	4
-#define SCD_TRHESH_155mV_68mV	5
-#define SCD_THRESH_178mV_89mV	6
-#define SCD_THRESH_200mV_100mV	7
 
-#define OCD_DEALY_10ms		0x0
-#define OCD_DELAY_20ms		0x1
-#define OCD_DELAY_40ms		0x2
-#define OCD_DELAY_80ms		0x3
-#define OCD_DELAY_160ms		0x4
-#define OCD_DELAY_320ms		0x5
-#define OCD_DELAY_640ms		0x6
-#define OCD_DELAY_1280ms	0x7
 
-#define OCD_THRESH_17mV_8mV		0
-#define OCD_THRESH_22mV_11mV	1
-#define OCD_THRESH_28mV_14mV	2
-#define OCD_THRESH_33mV_17mV	3
-#define OCD_THRESH_39mV_19mV	4
-#define OCD_THRESH_44mV_22mV	5
-#define OCD_THRESH_50mV_25mV	6
-#define OCD_THRESH_56mV_28MV	7
-#define OCD_THRESH_61mV_31mV	8
-#define OCD_THRESH_67mV_33mV	9
-#define OCD_THRESH_72mV_36mV	0xA
-#define OCD_THRESH_78mV_39mV	0xB
-#define OCD_THRESH_83mV_42mV	0xC
-#define OCD_THRESH_89mV_44mV	0xD
-#define OCD_THRESH_94mV_47mV	0xE
-#define OCD_THRESH_100mV_50mV	0xF
-
-#define UV_DELAY_1s				0
-#define UV_DELAY_4s				1
-#define UV_DELAY_8s				2
-#define UV_DELAY_16s			3
-
-#define OV_DELAY_1s				0
-#define OV_DELAY_2s				1
-#define OV_DELAY_4s				2
-#define OV_DELAY_8s				3
 
 #define OV_THRESH_BASE			0x2008
 #define UV_THRESH_BASE			0x1000
@@ -131,13 +46,6 @@
 
 #define TEMP_Hi 0x2C
 #define TEMP_Lo 0X2D
-
-
-unsigned char CRC8(unsigned char *ptr, unsigned char len,unsigned char key);
-
-int I2CWriteRegisterByteWithCRC(unsigned char I2CSlaveAddress, unsigned char Register, unsigned char Data);
-
-int I2CReadRegisterWordWithCRC(unsigned char I2CSlaveAddress, unsigned char Register, unsigned int *Data);
 
 typedef struct _Register_Group
 {
@@ -479,7 +387,6 @@ typedef struct _Register_Group
 	}ADCGain1;
 
 	unsigned char ADCOffset;
-
 	union
 	{
 		struct

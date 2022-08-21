@@ -404,9 +404,14 @@
               <FilePath>../Core/Src/stm32f4xx_hal_msp.c</FilePath>
             </File>
             <File>
-              <FileName>main050722.c</FileName>
+              <FileName>main050822.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\main050722.c</FilePath>
+              <FilePath>.\main050822.c</FilePath>
+            </File>
+            <File>
+              <FileName>bq_setting_OF.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\bq_setting_OF.c</FilePath>
             </File>
           </Files>
         </Group>

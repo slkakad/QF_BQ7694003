@@ -20,10 +20,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include <stdlib.h>
+#include <math.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "bqMaximo_Ctrl_G2553.h"
-//#include "battery_pack_config.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,7 +33,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define BQ_ADD 0x08
+
 #define TimeOutI2C 50
 #define CellCount 15
 #define TempSensorCount 3
@@ -48,6 +48,11 @@
 
 #define Max_Temp_Allowed 85
 #define Min_Temp_Allowed 05
+
+#define TemperatureBeta 3977 
+#define RT0 10000
+#define Temperature0 298
+#define DieTempraturTime 5    // 1,2,3,4,5 -> External Temp   5-6, 6-7  -> Rest 7-> Die Temp  8,9 -> Rest
 
 /* USER CODE END PD */
 
@@ -64,8 +69,7 @@ typedef enum
 	Oper_OK = 0x00,
 	Oper_I2CFail = 0x01,
 	Oper_CRCFail = 0x02,
-	Oper_WRFail = 0x03,
-	Oper_MemFail =0x04
+	Oper_WRFail = 0x03
 }OperStatusTypedef;
 /* USER CODE BEGIN PV */
 RegisterGroup Registers;
@@ -85,10 +89,14 @@ int iGain = 0, Result = 0;
 
 uint8_t MaxTempSensorCount = 0,MinTempSensorCount = 0;
 uint8_t TIM3_FLAG=0;
+uint8_t SysConfig ;
 uint32_t CellSum=0;
-uint16_t CellVoltage[15],BatteryVoltage,TempSense[3];
+uint16_t CellVoltage[15],BatteryVoltage;
+float ExternalTempraturarSense[3],DieTempraturarSense[2];
 uint16_t CellMax,CellMin,TempMax,TempMin;
 uint8_t CellTempMaxIndex,CellTempMinIndex,CellVoltMaxIndex,CellVoltMinIndex;
+
+
 
 /* USER CODE END PV */
 
@@ -175,16 +183,11 @@ OperStatusTypedef I2CWriteRegistorWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Ad
 }
 OperStatusTypedef I2CWriteBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Address,uint8_t Register,uint8_t *Buffer,uint8_t Length)
 {
-	unsigned char *BufferCRC, *Pointer;
+	unsigned char size = 2*Length +2;
+	unsigned char BufferCRC[size], *Pointer;
 	int i;
 	HAL_StatusTypeDef status;
-
-	BufferCRC = (unsigned char*)malloc(2*Length + 2);
-	if (NULL == BufferCRC)
-	{
-		return Oper_MemFail;
-	}
-
+	
 	Pointer = BufferCRC;
 	*Pointer = I2C_Address<<1;
 	Pointer++;
@@ -207,25 +210,19 @@ OperStatusTypedef I2CWriteBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Addre
 	{
 		return Oper_I2CFail;
 	}
-	free(BufferCRC);
-	BufferCRC = NULL;
-
 	return Oper_OK;
 }
 
 
 OperStatusTypedef I2CReadBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Address,uint8_t Register,uint8_t *Buffer,uint8_t Length)
 {
-	uint8_t *ReadData=NULL, *StartData = NULL;;
+	uint8_t size =2 * Length;
+	uint8_t *ReadData=NULL, StartData[size];
 	unsigned char CRCInput[2];
 	unsigned char CRC_Value = 0;
 	HAL_StatusTypeDef status;
-	StartData = (unsigned char *)malloc(2 * Length);
 	int i;
-	if (NULL == StartData)
-	{
-    	return Oper_MemFail;
-	}
+
 	ReadData = StartData;
 
 	status = HAL_I2C_Master_Transmit(hi2c,(I2C_Address << 1),&Register,1,TimeOutI2C);    // CRC -> N
@@ -243,8 +240,7 @@ OperStatusTypedef I2CReadBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Addres
 	ReadData++;
 	if (CRC_Value != *ReadData)
 	{
-		free(StartData);
-		StartData = NULL;
+
 		return Oper_CRCFail;
 	}
 	else
@@ -260,8 +256,7 @@ OperStatusTypedef I2CReadBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Addres
 
 		if (CRC_Value != *ReadData)
 		{
-			free(StartData);
-			StartData = NULL;
+
 
 			return Oper_CRCFail;
 		}
@@ -269,13 +264,12 @@ OperStatusTypedef I2CReadBlockWithCRC(I2C_HandleTypeDef *hi2c,uint8_t I2C_Addres
 			*Buffer = *(ReadData - 1);
 	}
 
-	free(StartData);
-	StartData = NULL;
+
 
 	return Oper_OK;
 	
 }
-OperStatusTypedef I2CReadRegisterByteWithCRC(I2C_HandleTypeDef *hi2c,unsigned char I2CSlaveAddress, unsigned char Register, unsigned char *Data)
+OperStatusTypedef I2CReadRegisterWithCRC(I2C_HandleTypeDef *hi2c,unsigned char I2CSlaveAddress, unsigned char Register, unsigned char *Data)
 {
 	unsigned char TargetRegister = Register;
 	unsigned char ReadData[2];
@@ -306,24 +300,26 @@ OperStatusTypedef I2CReadRegisterByteWithCRC(I2C_HandleTypeDef *hi2c,unsigned ch
 
 OperStatusTypedef GetADCGainOffset()    /* I2C byter read*/ 
 {
-	HAL_StatusTypeDef result;
-	result=HAL_I2C_Mem_Read(&hi2c1,((BQ_ADD)<<1)|0x01, ADCGAIN1, 1,&(Registers.ADCGain1.ADCGain1Byte),sizeof(Registers.ADCGain1.ADCGain1Byte),TimeOutI2C);
-	if ( result  !=  HAL_OK)
-	{
-		return  Oper_I2CFail;;
-	}
-  result=HAL_I2C_Mem_Read(&hi2c1,((BQ_ADD)<<1)|0x01, ADCGAIN2, 1,&(Registers.ADCGain2.ADCGain2Byte),sizeof(Registers.ADCGain1.ADCGain1Byte),TimeOutI2C);
-  if ( result  !=  HAL_OK)
-	{
-		return Oper_I2CFail;
-	}
-	result=HAL_I2C_Mem_Read(&hi2c1,((BQ_ADD)<<1)|0x01, ADCOFFSET, 1,&(Registers. ADCOffset),sizeof(Registers. ADCOffset),TimeOutI2C);
-	if ( result  !=  HAL_OK)
-	{
-		//Status  =  Oper_I2CFail;
-		return Oper_I2CFail;
-	}
-	return Oper_OK;
+	OperationStatus= I2CReadBlockWithCRC(&hi2c1,BQ_ADD,ADCGAIN1,&(Registers.ADCGain1.ADCGain1Byte),3);
+//	HAL_StatusTypeDef result;
+//	result=HAL_I2C_Mem_Read(&hi2c1,((BQ_ADD)<<1)|0x01, ADCGAIN1, 1,&(Registers.ADCGain1.ADCGain1Byte),sizeof(Registers.ADCGain1.ADCGain1Byte),TimeOutI2C);
+//	if ( result  !=  HAL_OK)
+//	{
+//		return  Oper_I2CFail;;
+//	}
+//  result=HAL_I2C_Mem_Read(&hi2c1,((BQ_ADD)<<1)|0x01, ADCGAIN2, 1,&(Registers.ADCGain2.ADCGain2Byte),sizeof(Registers.ADCGain1.ADCGain1Byte),TimeOutI2C);
+//  if ( result  !=  HAL_OK)
+//	{
+//		return Oper_I2CFail;
+//	}
+//	result=HAL_I2C_Mem_Read(&hi2c1,((BQ_ADD)<<1)|0x01, ADCOFFSET, 1,&(Registers. ADCOffset),sizeof(Registers. ADCOffset),TimeOutI2C);
+//	if ( result  !=  HAL_OK)
+//	{
+//		//Status  =  Oper_I2CFail;
+//		return Oper_I2CFail;
+//	}
+//	return Oper_OK;
+	return OperationStatus;
 }
 OperStatusTypedef ConfigureBqMaximo()
 {
@@ -407,30 +403,58 @@ OperStatusTypedef UpdateBatteryVolatge()
    BatteryVoltage= 4*Gain*(((Registers.VBat.VBatByte.BAT_HI)<<8)+ Registers.VBat.VBatByte.BAT_LO)+(CellCount*Registers. ADCOffset);
 	return status;
 }
-OperStatusTypedef UpdateTemp()
+OperStatusTypedef UpdateExternalTemp(float *TempStore , uint8_t length)
 {		
 	OperStatusTypedef status;
-	uint8_t i=0;
-	unsigned int iTemp = 0;
+	uint8_t i=0,*pRawADCData = NULL ;
+	uint16_t tempRes,iTemp=0;
 	unsigned long lTemp = 0;
-	unsigned char *pRawADCData = NULL ;
-	uint16_t *pPointer = TempSense;
-	status  = I2CReadBlockWithCRC(&hi2c1,BQ_ADD,TEMP_Hi,&(Registers.TS1.TS1Byte.TS1_HI),(ExternalTemprature*2));
+	float TempResLog = 0;
+	float *pPointer = TempStore;
+	
+	status  = I2CReadBlockWithCRC(&hi2c1,BQ_ADD,TEMP_Hi,&(Registers.TS1.TS1Byte.TS1_HI),(length*2));
 	if (status != Oper_OK)
 	{
 		return status;
 	}
 	pRawADCData =  &(Registers.TS1.TS1Byte.TS1_HI);
-	for (i = 0; i < ExternalTemprature; i++)
+	for (i = 0; i < length; i++)
 	{
 		iTemp = (unsigned int)(unsigned int)(*pRawADCData << 8) + *(pRawADCData + 1);
 		lTemp = iTemp*382/1000;
-		*pPointer =(10000*lTemp)/(3300-lTemp);
+		tempRes =(10000*lTemp)/(3300-lTemp);
+		TempResLog = log((double)tempRes/RT0)/TemperatureBeta;
+		*pPointer= 1.0f / (TempResLog + (1.0f /Temperature0));
+		*pPointer  =  *pPointer  - 273.0f;
 		pPointer += 1;
 		pRawADCData += 2;
 	}
 	return status;
  }
+OperStatusTypedef UpdateDieTemp(float *TempStore , uint8_t length)
+{
+	OperStatusTypedef status;
+	uint8_t i=0,*pRawADCData = NULL ;
+	uint16_t iTemp=0;
+	unsigned long lTemp = 0;
+	float *pPointer = TempStore;
+	
+	status  = I2CReadBlockWithCRC(&hi2c1,BQ_ADD,TEMP_Hi,&(Registers.TS1.TS1Byte.TS1_HI),(length*2));
+	if (status != Oper_OK)
+	{
+		return status;
+	}
+	pRawADCData =  &(Registers.TS1.TS1Byte.TS1_HI);
+	for (i = 0; i < length; i++)
+	{
+		iTemp = (unsigned int)(unsigned int)(*pRawADCData << 8) + *(pRawADCData + 1);
+		lTemp = iTemp*382/1000;
+		*pPointer= 25 - ((lTemp - 1200)/4.2f);
+		pPointer += 1;
+		pRawADCData += 2;
+	}
+	return status;
+}
 OperStatusTypedef UpdateCurrent()
 {
 	OperStatusTypedef status;
@@ -439,8 +463,8 @@ OperStatusTypedef UpdateCurrent()
 }
 void TempratureProtection()
 {
-	Maximum(TempSense,TempSensorCount,&TempMax,&CellTempMaxIndex);
-	Minimum(TempSense,TempSensorCount,&TempMin,&CellTempMinIndex);
+//	Maximum(TempSense,TempSensorCount,&TempMax,&CellTempMaxIndex);
+//	Minimum(TempSense,TempSensorCount,&TempMin,&CellTempMinIndex);
 	if (TempMin < Min_Temp_Allowed)
 	{
 		HAL_GPIO_WritePin(GPIOD,GPIO_PIN_12,GPIO_PIN_SET);   // LED indication
@@ -506,6 +530,10 @@ void MaxCurrentCal()
 				Set into BQ Registeor
 			} */
 }
+void CurrentProtection()
+{
+	;
+}
 /* USER CODE END 0 */
 
 /**
@@ -515,6 +543,7 @@ void MaxCurrentCal()
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	uint8_t TempratureSelFlag=0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -547,7 +576,23 @@ int main(void)
 		//or repete
 	}
 	Registers.SysCtrl1.SysCtrl1Bit.TEMP_SEL=1;
-	OperationStatus = I2CReadRegisterByteWithCRC(&hi2c1,BQ_ADD,SYS_CTRL1,&(Registers.SysCtrl1.SysCtrl1Byte));
+	OperationStatus = I2CReadRegisterWithCRC(&hi2c1,BQ_ADD,SYS_CTRL1,&(Registers.SysCtrl1.SysCtrl1Byte));
+	Registers.SysCtrl2.SysCtrl2Bit.CHG_ON = 0;
+	Registers.SysCtrl2.SysCtrl2Bit.DSG_ON =0;
+	OperationStatus=I2CWriteRegistorWithCRC(&hi2c1,BQ_ADD,SYS_CTRL2,Registers.SysCtrl2.SysCtrl2Byte);
+	
+	Registers.CCCfg = 0x19;
+	OperationStatus = I2CWriteRegistorWithCRC(&hi2c1,BQ_ADD,0x0B,Registers.CCCfg);
+	
+	I2CReadRegisterWithCRC(&hi2c1,BQ_ADD,SYS_CTRL2,&(Registers.SysCtrl2.SysCtrl2Byte));
+	Registers.SysCtrl2.SysCtrl2Bit.CC_EN = 0;
+	Registers.SysCtrl2.SysCtrl2Bit.CC_ONESHOT = 1;
+	I2CWriteRegistorWithCRC(&hi2c1,BQ_ADD,SYS_CTRL2,Registers.SysCtrl2.SysCtrl2Byte);
+	
+	
+	
+	
+
 	// external inturrupt pin on ALERT PIN and Decide sub routing 
   // Setting of Thrshold Value  and Delay's for Protection (OV, UV, OC,SC with Delay)
 	// Get privios value of SD card  Intial SoC, R0,R1,C1 SoH
@@ -560,16 +605,56 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		//Check for Device XReady flag include with below if with another flag 
-		if(TIM3_FLAG== 1)				// TimerBaseFlag at every 1Hz
+		I2CReadRegisterWithCRC(&hi2c1,BQ_ADD,SYS_STAT,&(Registers.SysStatus.StatusByte));
+		I2CReadRegisterWithCRC(&hi2c1,BQ_ADD,SYS_CTRL1,&(Registers.SysCtrl1.SysCtrl1Byte));
+		I2CReadRegisterWithCRC(&hi2c1,BQ_ADD,SYS_CTRL2,&(Registers.SysCtrl2.SysCtrl2Byte));
+		if(Registers.SysCtrl1.SysCtrl1Bit.LOAD_PRESENT  == 1  && Registers.SysCtrl2.SysCtrl2Bit.CC_EN == 0 &&  (Registers.SysStatus.StatusByte & 0x7F) == 0x00);
 		{
-			TIM3_FLAG = 0;
-			OperationStatus = UpdateCellVoltage();
-			CellProtection();
-			OperationStatus= UpdateBatteryVolatge();
-			OperationStatus= UpdateTemp();	
+			// Load is connected and DSG_PIN can be 1  and no fault is detected
+			// Depends upon can bus data can be set for testing 
+		}			
+		I2CReadRegisterWithCRC(&hi2c1,BQ_ADD,SYS_STAT,&(Registers.SysStatus.StatusByte));
+		if(TIM3_FLAG== 1 && Registers.SysStatus.StatusBit.CC_READY == 1 && SysConfig == 0)
+			{
+				TIM3_FLAG = 0;
+				TempratureSelFlag++;
+				OperationStatus = UpdateCellVoltage();
+				CellProtection();
+				OperationStatus= UpdateBatteryVolatge();
+				if (TempratureSelFlag <= DieTempraturTime)
+					{
+						OperationStatus= UpdateExternalTemp(ExternalTempraturarSense,3);
+					}
+					else if (TempratureSelFlag > DieTempraturTime)
+						{
+							if( TempratureSelFlag < (DieTempraturTime+2))
+								{
+									if(Registers.SysCtrl1.SysCtrl1Bit.TEMP_SEL !=0)
+										{
+											Registers.SysCtrl1.SysCtrl1Bit.TEMP_SEL = 0;
+											OperationStatus = I2CWriteRegistorWithCRC(&hi2c1,BQ_ADD,SYS_CTRL1,Registers.SysCtrl1.SysCtrl1Byte);
+										}						
+								}
+							else if (TempratureSelFlag == (DieTempraturTime+2))
+								{
+									OperationStatus= UpdateDieTemp(DieTempraturarSense,2);
+								}
+							else if(TempratureSelFlag > (DieTempraturTime+5))
+								{
+									if(Registers.SysCtrl1.SysCtrl1Bit.TEMP_SEL !=1)
+										{
+											Registers.SysCtrl1.SysCtrl1Bit.TEMP_SEL = 1;
+											OperationStatus = I2CWriteRegistorWithCRC(&hi2c1,BQ_ADD,SYS_CTRL1,Registers.SysCtrl1.SysCtrl1Byte);
+										}				
+								}
+							else if(TempratureSelFlag == (DieTempraturTime+5))
+								{
+										TempratureSelFlag = 0;
+								}
+					}
 			TempratureProtection();	
-		  OperationStatus= UpdateCurrent();	
+			OperationStatus= UpdateCurrent();
+			CurrentProtection();
 			//Comparition of all cell voltage and Battery voltage and Gain 2 for varification and gain calculation 
 			//RLMS adn UKF for every cell 
 			// Store data in SD card 

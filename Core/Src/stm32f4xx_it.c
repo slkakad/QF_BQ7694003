@@ -21,13 +21,14 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f4xx_it.h"
+#include "bqMaximo_Ctrl_G2553.h"
+#include "bq_setting_QF.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
-
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -47,7 +48,6 @@
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
-
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -57,8 +57,13 @@
 
 /* External variables --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim3;
+extern I2C_HandleTypeDef hi2c1;
+extern RegisterGroup Registers;
+extern PackStateTypedef CellBoundery;
+extern OperStatusTypedef OperationStatus;
+
 /* USER CODE BEGIN EV */
-    extern uint8_t TIM3_FLAG ;
+ extern uint8_t TIM3_FLAG ;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -196,6 +201,29 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles EXTI line[9:5] interrupts.
+  */
+void EXTI9_5_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI9_5_IRQn 0 */
+
+  /* USER CODE END EXTI9_5_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(ALERT_Pin);
+  /* USER CODE BEGIN EXTI9_5_IRQn 1 */
+  I2CReadRegisterWithCRC(&hi2c1,BQ_ADD,SYS_STAT,&(Registers.SysStatus.StatusByte));
+	if( Registers.SysStatus.StatusByte > 0 && Registers.SysStatus.StatusBit.CC_READY != 1)
+	{
+		Registers.SysCtrl2.SysCtrl2Bit.DSG_ON = 0;
+		Registers.SysCtrl2.SysCtrl2Bit.CHG_ON = 0;
+		I2CWriteRegistorWithCRC(&hi2c1,BQ_ADD,SYS_CTRL2,Registers.SysCtrl2.SysCtrl2Byte);
+	}	
+	// find the fault 
+	// Log the data 
+	// Provide CAN msgs for fault	
+  /* USER CODE END EXTI9_5_IRQn 1 */
+}
 
 /**
   * @brief This function handles TIM3 global interrupt.

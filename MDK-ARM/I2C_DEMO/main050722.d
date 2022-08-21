@@ -33,4 +33,5 @@ i2c_demo\main050722.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.
 i2c_demo\main050722.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h
 i2c_demo\main050722.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h
 i2c_demo\main050722.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+i2c_demo\main050722.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 i2c_demo\main050722.o: ../Core/Inc/bqMaximo_Ctrl_G2553.h
