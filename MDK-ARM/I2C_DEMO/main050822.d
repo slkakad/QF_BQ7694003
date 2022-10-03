@@ -36,3 +36,5 @@ i2c_demo\main050822.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 i2c_demo\main050822.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 i2c_demo\main050822.o: ../Core/Inc/bqMaximo_Ctrl_G2553.h
 i2c_demo\main050822.o: ../Core/Inc/bq_setting_QF.h
+i2c_demo\main050822.o: ../Core/Inc/Protection.h
+i2c_demo\main050822.o: ..\MDK-ARM\PackStatus.h

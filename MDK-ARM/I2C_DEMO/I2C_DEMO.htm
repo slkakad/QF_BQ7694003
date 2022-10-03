@@ -3,7 +3,7 @@
 <title>Static Call Graph - [I2C_DEMO\I2C_DEMO.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image I2C_DEMO\I2C_DEMO.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Sun Aug 21 22:18:51 2022
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060960: Last Updated: Mon Oct 03 14:58:31 2022
 <BR><P>
 <H3>Maximum Stack Usage =        288 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -572,7 +572,7 @@ Global Symbols
 <LI><a href="#[7e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CReadRegisterWithCRC
 </UL>
 
-<P><STRONG><a name="[74]"></a>CellBounderyTempratureWindowProtection</STRONG> (Thumb, 332 bytes, Stack size 8 bytes, bq_setting_of.o(i.CellBounderyTempratureWindowProtection))
+<P><STRONG><a name="[74]"></a>CellBounderyTempratureWindowProtection</STRONG> (Thumb, 332 bytes, Stack size 8 bytes, protection.o(i.CellBounderyTempratureWindowProtection))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144<LI>Call Chain = CellBounderyTempratureWindowProtection &rArr; MosfetSwitching &rArr; I2CWriteRegistorWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MosfetSwitching
@@ -580,18 +580,18 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TempratureProtection
 </UL>
 
-<P><STRONG><a name="[76]"></a>CellVoltageProtection</STRONG> (Thumb, 256 bytes, Stack size 8 bytes, bq_setting_of.o(i.CellVoltageProtection))
+<P><STRONG><a name="[76]"></a>CellVoltageProtection</STRONG> (Thumb, 256 bytes, Stack size 8 bytes, protection.o(i.CellVoltageProtection))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144<LI>Call Chain = CellVoltageProtection &rArr; MosfetSwitching &rArr; I2CWriteRegistorWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
-<BR>[Calls]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MosfetSwitching
-<LI><a href="#[78]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Minimum
+<BR>[Calls]<UL><LI><a href="#[78]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Minimum
 <LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Maximum
+<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MosfetSwitching
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[79]"></a>ConfigureBqMaximo</STRONG> (Thumb, 128 bytes, Stack size 24 bytes, main050822.o(i.ConfigureBqMaximo))
-<BR><BR>[Stack]<UL><LI>Max Depth = 184<LI>Call Chain = ConfigureBqMaximo &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 176<LI>Call Chain = ConfigureBqMaximo &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CWriteBlockWithCRC
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CReadBlockWithCRC
@@ -599,7 +599,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;InitialisebqMaximo
 </UL>
 
-<P><STRONG><a name="[7c]"></a>CurrentProtection</STRONG> (Thumb, 76 bytes, Stack size 8 bytes, bq_setting_of.o(i.CurrentProtection))
+<P><STRONG><a name="[7c]"></a>CurrentProtection</STRONG> (Thumb, 72 bytes, Stack size 8 bytes, protection.o(i.CurrentProtection))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144<LI>Call Chain = CurrentProtection &rArr; MosfetSwitching &rArr; I2CWriteRegistorWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MosfetSwitching
@@ -626,7 +626,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[80]"></a>GetADCGainOffset</STRONG> (Thumb, 28 bytes, Stack size 8 bytes, main050822.o(i.GetADCGainOffset))
-<BR><BR>[Stack]<UL><LI>Max Depth = 168<LI>Call Chain = GetADCGainOffset &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = GetADCGainOffset &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CReadBlockWithCRC
 </UL>
@@ -890,8 +890,8 @@ Global Symbols
 <P><STRONG><a name="[3]"></a>HardFault_Handler</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, stm32f4xx_it.o(i.HardFault_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(RESET)
 </UL>
-<P><STRONG><a name="[7b]"></a>I2CReadBlockWithCRC</STRONG> (Thumb, 230 bytes, Stack size 72 bytes, bq_setting_of.o(i.I2CReadBlockWithCRC))
-<BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
+<P><STRONG><a name="[7b]"></a>I2CReadBlockWithCRC</STRONG> (Thumb, 234 bytes, Stack size 64 bytes, bq_setting_of.o(i.I2CReadBlockWithCRC))
+<BR><BR>[Stack]<UL><LI>Max Depth = 152<LI>Call Chain = I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_I2C_Master_Transmit
 <LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_I2C_Master_Receive
@@ -942,7 +942,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[b2]"></a>InitialisebqMaximo</STRONG> (Thumb, 306 bytes, Stack size 24 bytes, main050822.o(i.InitialisebqMaximo))
-<BR><BR>[Stack]<UL><LI>Max Depth = 208<LI>Call Chain = InitialisebqMaximo &rArr; ConfigureBqMaximo &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = InitialisebqMaximo &rArr; ConfigureBqMaximo &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_i2d
 <LI><a href="#[67]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ddiv
@@ -953,7 +953,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[77]"></a>Maximum</STRONG> (Thumb, 48 bytes, Stack size 20 bytes, bq_setting_of.o(i.Maximum))
+<P><STRONG><a name="[77]"></a>Maximum</STRONG> (Thumb, 48 bytes, Stack size 20 bytes, protection.o(i.Maximum))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = Maximum
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TempratureProtection
@@ -963,14 +963,14 @@ Global Symbols
 <P><STRONG><a name="[4]"></a>MemManage_Handler</STRONG> (Thumb, 4 bytes, Stack size 0 bytes, stm32f4xx_it.o(i.MemManage_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(RESET)
 </UL>
-<P><STRONG><a name="[78]"></a>Minimum</STRONG> (Thumb, 50 bytes, Stack size 20 bytes, bq_setting_of.o(i.Minimum))
+<P><STRONG><a name="[78]"></a>Minimum</STRONG> (Thumb, 50 bytes, Stack size 20 bytes, protection.o(i.Minimum))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = Minimum
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TempratureProtection
 <LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CellVoltageProtection
 </UL>
 
-<P><STRONG><a name="[75]"></a>MosfetSwitching</STRONG> (Thumb, 144 bytes, Stack size 16 bytes, bq_setting_of.o(i.MosfetSwitching))
+<P><STRONG><a name="[75]"></a>MosfetSwitching</STRONG> (Thumb, 88 bytes, Stack size 16 bytes, protection.o(i.MosfetSwitching))
 <BR><BR>[Stack]<UL><LI>Max Depth = 136<LI>Call Chain = MosfetSwitching &rArr; I2CWriteRegistorWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CWriteRegistorWithCRC
@@ -979,6 +979,7 @@ Global Symbols
 <LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TempratureProtection
 <LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CurrentProtection
 <LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CellVoltageProtection
+<LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[2]"></a>NMI_Handler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, stm32f4xx_it.o(i.NMI_Handler))
@@ -1030,20 +1031,20 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_ConfigClockSource
 </UL>
 
-<P><STRONG><a name="[b9]"></a>TempratureProtection</STRONG> (Thumb, 192 bytes, Stack size 16 bytes, bq_setting_of.o(i.TempratureProtection))
+<P><STRONG><a name="[b9]"></a>TempratureProtection</STRONG> (Thumb, 192 bytes, Stack size 16 bytes, protection.o(i.TempratureProtection))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = TempratureProtection &rArr; CellBounderyTempratureWindowProtection &rArr; MosfetSwitching &rArr; I2CWriteRegistorWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GPIO_WritePin
-<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MosfetSwitching
 <LI><a href="#[78]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Minimum
 <LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Maximum
 <LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CellBounderyTempratureWindowProtection
+<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MosfetSwitching
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[bb]"></a>UpdateBatteryVolatge</STRONG> (Thumb, 102 bytes, Stack size 16 bytes, main050822.o(i.UpdateBatteryVolatge))
-<BR><BR>[Stack]<UL><LI>Max Depth = 176<LI>Call Chain = UpdateBatteryVolatge &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 168<LI>Call Chain = UpdateBatteryVolatge &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CReadBlockWithCRC
 </UL>
@@ -1051,7 +1052,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[bc]"></a>UpdateCellVoltage</STRONG> (Thumb, 122 bytes, Stack size 24 bytes, main050822.o(i.UpdateCellVoltage))
-<BR><BR>[Stack]<UL><LI>Max Depth = 184<LI>Call Chain = UpdateCellVoltage &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 176<LI>Call Chain = UpdateCellVoltage &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CReadBlockWithCRC
 </UL>
@@ -1059,7 +1060,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[bd]"></a>UpdateCurrent</STRONG> (Thumb, 66 bytes, Stack size 16 bytes, main050822.o(i.UpdateCurrent))
-<BR><BR>[Stack]<UL><LI>Max Depth = 176<LI>Call Chain = UpdateCurrent &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 168<LI>Call Chain = UpdateCurrent &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CReadBlockWithCRC
 </UL>
@@ -1067,7 +1068,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[be]"></a>UpdateDieTemp</STRONG> (Thumb, 138 bytes, Stack size 40 bytes, main050822.o(i.UpdateDieTemp))
-<BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = UpdateDieTemp &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
+<BR><BR>[Stack]<UL><LI>Max Depth = 192<LI>Call Chain = UpdateDieTemp &rArr; I2CReadBlockWithCRC &rArr; HAL_I2C_Master_Transmit &rArr; I2C_MasterRequestWrite &rArr; I2C_WaitOnMasterAddressFlagUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CReadBlockWithCRC
 </UL>
@@ -1158,10 +1159,11 @@ Global Symbols
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;I2CReadBlockWithCRC
 </UL>
 
-<P><STRONG><a name="[5c]"></a>main</STRONG> (Thumb, 484 bytes, Stack size 0 bytes, main050822.o(i.main))
+<P><STRONG><a name="[5c]"></a>main</STRONG> (Thumb, 454 bytes, Stack size 0 bytes, main050822.o(i.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 288<LI>Call Chain = main &rArr; UpdateExternalTemp &rArr; __hardfp_log &rArr; __kernel_poly &rArr; __aeabi_dmul &rArr; _double_epilogue &rArr; _double_round
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;TempratureProtection
+<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MosfetSwitching
 <LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_TIM_Base_Start_IT
 <LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Init
 <LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CurrentProtection

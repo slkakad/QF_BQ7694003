@@ -1,4 +1,4 @@
-#define BQ_ADD 8
+#define BQ_ADD 0x08
 
 #define LOWBYTE(Data) (unsigned char)(0x00ff & Data)
 
@@ -27,10 +27,6 @@
 #define ADCOFFSET 0x51
 #define ADCGAIN2 0x59
 
-
-
-
-
 #define OV_THRESH_BASE			0x2008
 #define UV_THRESH_BASE			0x1000
 #define OV_STEP					0x10
@@ -46,6 +42,7 @@
 
 #define TEMP_Hi 0x2C
 #define TEMP_Lo 0X2D
+
 
 typedef struct _Register_Group
 {
@@ -398,4 +395,3 @@ typedef struct _Register_Group
 	}ADCGain2;
 
 }RegisterGroup;
-

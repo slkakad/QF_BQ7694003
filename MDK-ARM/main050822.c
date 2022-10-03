@@ -25,6 +25,8 @@
 /* USER CODE BEGIN Includes */
 #include "bqMaximo_Ctrl_G2553.h"
 #include "bq_setting_QF.h"
+#include "Protection.h"
+#include "PackStatus.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,8 +36,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
-
 
 /* USER CODE END PD */
 
@@ -243,24 +243,6 @@ OperStatusTypedef UpdateCurrent()
 	return status;
 }
 
-
-void MaxCurrentCal()
-{
-	/*if (Current  > 0)
-			{
-				Cal_MaxDischargeCurrent();
-			  send it to CAN
-			 Set into BQ Registeor
-			
-		}
-				if (Current  > 0)
-			{
-				Cal_MaxDischargeCurrent();
-				send it to CAN 
-				Set into BQ Registeor
-			} */
-}
-
 /* USER CODE END 0 */
 
 /**
@@ -271,46 +253,33 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	uint8_t TempratureSelFlag=0;
+	uint32_t Voltage_Check = 0;
   /* USER CODE END 1 */
-
   /* MCU Configuration--------------------------------------------------------*/
-
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
   /* USER CODE BEGIN Init */
-
   /* USER CODE END Init */
-
   /* Configure the system clock */
   SystemClock_Config();
-
   /* USER CODE BEGIN SysInit */
-
   /* USER CODE END SysInit */
-
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+	
 	HAL_TIM_Base_Start_IT(&htim3);
+	
 	OperationStatus =  InitialisebqMaximo();
-	if (OperationStatus != Oper_OK)
-	{
-		// LED indication 
-		// Fault and Log the Data
-		//or repete
-	}
+	// External Thermister Selection 
 	Registers.SysCtrl1.SysCtrl1Bit.TEMP_SEL=1;
 	OperationStatus = I2CReadRegisterWithCRC(&hi2c1,BQ_ADD,SYS_CTRL1,&(Registers.SysCtrl1.SysCtrl1Byte));
-	Registers.SysCtrl2.SysCtrl2Bit.CHG_ON = 0;
-	Registers.SysCtrl2.SysCtrl2Bit.DSG_ON =0;
-	OperationStatus=I2CWriteRegistorWithCRC(&hi2c1,BQ_ADD,SYS_CTRL2,Registers.SysCtrl2.SysCtrl2Byte);
-	
+	// System Setting 	
 	Registers.CCCfg = 0x19;
 	OperationStatus = I2CWriteRegistorWithCRC(&hi2c1,BQ_ADD,0x0B,Registers.CCCfg);
-	
+	// Current sensing in on shot mode 
 	I2CReadRegisterWithCRC(&hi2c1,BQ_ADD,SYS_CTRL2,&(Registers.SysCtrl2.SysCtrl2Byte));
 	Registers.SysCtrl2.SysCtrl2Bit.CC_EN = 0;
 	Registers.SysCtrl2.SysCtrl2Bit.CC_ONESHOT = 1;
@@ -323,15 +292,17 @@ int main(void)
 	// CC and ADC Enable 
 	
   /* USER CODE END 2 */
-
+	MosfetSwitching(MOSFET_OFF);
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+		
 		I2CReadRegisterWithCRC(&hi2c1,BQ_ADD,SYS_STAT,&(Registers.SysStatus.StatusByte));
 		I2CReadRegisterWithCRC(&hi2c1,BQ_ADD,SYS_CTRL1,&(Registers.SysCtrl1.SysCtrl1Byte));
 		I2CReadRegisterWithCRC(&hi2c1,BQ_ADD,SYS_CTRL2,&(Registers.SysCtrl2.SysCtrl2Byte));
-		if(Registers.SysCtrl1.SysCtrl1Bit.LOAD_PRESENT  == 1  && Registers.SysCtrl2.SysCtrl2Bit.CC_EN == 0 &&  (Registers.SysStatus.StatusByte & 0x7F) == 0x00)
+		
+		if(Registers.SysCtrl1.SysCtrl1Bit.LOAD_PRESENT  && !Registers.SysCtrl2.SysCtrl2Bit.CC_EN  &&  (Registers.SysStatus.StatusByte & 0x7F) == 0x00)
 		{
 			// Load is connected and DSG_PIN can be 1  and no fault is detected
 			// Depends upon can bus data can be set for testing 
@@ -340,10 +311,12 @@ int main(void)
 		if(TIM3_FLAG== 1 && Registers.SysStatus.StatusBit.CC_READY == 1 && SysConfig == 0)
 			{
 				TIM3_FLAG = 0;
+				Voltage_Check++;
 				TempratureSelFlag++;
 				OperationStatus = UpdateCellVoltage();
 				PackViolation.CellVoltViolation=CellVoltageProtection();
 				OperationStatus= UpdateBatteryVolatge();
+				// Check Battery Voltage and ADC Voltage
 				if (TempratureSelFlag <= DieTempraturTime)
 				{
 					OperationStatus= UpdateExternalTemp(PackMesurment.ExternalTempraturarSense,3);
@@ -516,7 +489,6 @@ static void MX_TIM3_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM3_Init 2 */
-
   /* USER CODE END TIM3_Init 2 */
 
 }

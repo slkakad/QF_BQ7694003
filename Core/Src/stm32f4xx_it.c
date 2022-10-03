@@ -23,6 +23,8 @@
 #include "stm32f4xx_it.h"
 #include "bqMaximo_Ctrl_G2553.h"
 #include "bq_setting_QF.h"
+#include "Protection.h"
+#include "PackStatus.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */

@@ -4,6 +4,7 @@
 "i2c_demo\stm32f4xx_hal_msp.o"
 "i2c_demo\main050822.o"
 "i2c_demo\bq_setting_of.o"
+"i2c_demo\protection.o"
 "i2c_demo\stm32f4xx_hal_i2c.o"
 "i2c_demo\stm32f4xx_hal_i2c_ex.o"
 "i2c_demo\stm32f4xx_hal_rcc.o"
